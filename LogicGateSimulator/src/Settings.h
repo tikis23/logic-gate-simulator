@@ -10,6 +10,7 @@ public:
 	static bool drawGrid;
 	static float panSpeed;
 	static float zoomSpeed;
+	static int currentMapID;
 private:
 	Settings();
 };

@@ -1,9 +1,17 @@
 #include "CircuitManager.h"
-#include "DefinedCircuits.h"
-
 CircuitManager::CircuitManager()
 {
+	mapID = 0;
+	for (auto it = managers.cbegin(), end = managers.cend(); it != end && mapID == it->first; ++it, ++mapID)
+	{
+	}
+	managers[mapID] = this;
+}
 
+CircuitManager::~CircuitManager()
+{
+	Exit();
+	managers.erase(mapID);
 }
 
 bool CircuitManager::UpdateHovered()
@@ -184,4 +192,4 @@ void CircuitManager::Exit()
 		delete it.first;
 }
 
-std::unordered_map<Circuit*, CircuitManager::CircuitType> CircuitManager::circuits;
+std::unordered_map<int, CircuitManager*> CircuitManager::managers;

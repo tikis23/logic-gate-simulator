@@ -58,6 +58,8 @@ Program::Program()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	// start loops
+	new CircuitManager;
 	std::thread logicThread(&Program::logicLoop, this);
 	renderLoop();
 	logicThread.join();
@@ -65,7 +67,8 @@ Program::Program()
 
 Program::~Program()
 {
-	CircuitManager::Exit();
+	for(auto& it : CircuitManager::managers)
+		it.second->Exit();
 	glfwSetErrorCallback(NULL);
 	ImGuiManager::Exit();
 	WindowManager::Terminate();
@@ -79,7 +82,7 @@ void Program::logicLoop()
 		auto timerStart = std::chrono::system_clock::now();
 
 		// update circuits
-		CircuitManager::Update();
+		CircuitManager::managers[Settings::currentMapID]->Update();
 		// update wires
 		WireManager::Update();
 
@@ -111,10 +114,10 @@ void Program::renderLoop()
 		{
 			// navigation input
 			if (!Input::GetMouseButton(WindowManager::GetWindow("main")->GetHandle(), Input::Mouse::LEFT, Input::Action::HOLD))
-				isAnyHovered = CircuitManager::UpdateHovered();
+				isAnyHovered = CircuitManager::managers[Settings::currentMapID]->UpdateHovered();
 			CoordinateSystem::UpdateCamera(isAnyHovered);
 		}
-		CircuitManager::UpdateHoveredIO();
+		CircuitManager::managers[Settings::currentMapID]->UpdateHoveredIO();
 
 		// render
 		Renderer::Render();

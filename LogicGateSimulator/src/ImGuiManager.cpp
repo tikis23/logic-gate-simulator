@@ -8,6 +8,8 @@
 #include "WindowManager.h"
 #include "DefinedCircuits.h"
 #include "Input.h"
+#include "Settings.h"
+
 void ImGuiManager::Init()
 {
 	IMGUI_CHECKVERSION();
@@ -33,6 +35,11 @@ bool ImGuiManager::Update()
 	bool hovered = false;
 	if (ImGui::Begin("Settings"))
 	{
+		if (ImGui::InputInt("Current Map ID", &Settings::currentMapID))
+		{
+			if (CircuitManager::managers.find(Settings::currentMapID) == CircuitManager::managers.end())
+				Settings::currentMapID = 0;
+		}
 		if (ImGui::BeginListBox("Circuits"))
 		{
 			// custom
@@ -102,7 +109,7 @@ bool ImGuiManager::Update()
 	{
 		if(ImGui::Button("Delete"))
 		{
-			CircuitManager::RemoveCircuit(deletableCircuit);
+			CircuitManager::managers[Settings::currentMapID]->RemoveCircuit(deletableCircuit);
 			deletableCircuit = nullptr;
 			ImGui::CloseCurrentPopup();
 		}

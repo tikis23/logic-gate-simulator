@@ -1,6 +1,5 @@
 #pragma once
 #include "Circuit.h"
-#include "CircuitManager.h"
 #include <vector>
 namespace DefinedCircuit
 {
@@ -201,9 +200,11 @@ public:
 	CUSTOM();
 	~CUSTOM();
 	void Update();
-	void EditMode();
+	void UpdateIO();
+	void EnterEditMode();
+	void ExitEditMode();
 	Circuit* circuit;
+	int internalMapID;
+	int mapID;
 private:
-	std::vector<InputNode>inputs;
-	std::vector<OutputNode>output;
 };

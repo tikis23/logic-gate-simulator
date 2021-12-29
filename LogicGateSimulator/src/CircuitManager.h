@@ -2,23 +2,26 @@
 
 #include <unordered_map>
 #include "Circuit.h"
+#include "DefinedCircuits.h"
 class CircuitManager
 {
 public:
 	CircuitManager();
-	static bool UpdateHovered();
-	static bool UpdateHoveredIO();
-	static void RemoveCircuit(Circuit* circuit);
-	static void Update();
-	static void Exit();
+	~CircuitManager();
+	bool UpdateHovered();
+	bool UpdateHoveredIO();
+	void RemoveCircuit(Circuit* circuit);
+	void Update();
+	void Exit();
 	
 	struct CircuitType
 	{
 		int type = 0;
 		void* pointer;
 	};
-	static std::unordered_map<Circuit*, CircuitType> circuits;
-
-private:
-
+	std::unordered_map<Circuit*, CircuitType> circuits;
+	int mapID;
+	std::vector<InputNode*> inputs;
+	std::vector<OutputNode*> outputs;
+	static std::unordered_map<int, CircuitManager*> managers;
 };

@@ -3,10 +3,11 @@
 #include "CircuitManager.h"
 #include "GridRenderer.h"
 #include "WireManager.h"
+#include "Settings.h"
 void Renderer::Render()
 {
 	GridRenderer::Render();
-	for (auto& circ : CircuitManager::circuits)
+	for (auto& circ : CircuitManager::managers[Settings::currentMapID]->circuits)
 	{
 		circ.first->RenderBox();
 		circ.first->RenderOutline();

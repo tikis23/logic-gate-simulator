@@ -7,3 +7,4 @@ float Settings::fontColor[3] = {1.0f, 1.0f, 1.0f};
 bool Settings::drawGrid = true;
 float Settings::panSpeed = 8;
 float Settings::zoomSpeed = 13;
+int Settings::currentMapID = 0;

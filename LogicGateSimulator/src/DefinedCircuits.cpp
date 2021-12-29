@@ -2,6 +2,9 @@
 #include "WindowManager.h"
 #include "CoordinateSystem.h"
 #include "Input.h"
+#include "Settings.h"
+#include "CircuitManager.h"
+#include "WireManager.h"
 
 void CreateDefinedCircuit(int type)
 {
@@ -76,15 +79,15 @@ void CreateDefinedCircuit(int type)
 LED::LED()
 {
 	circuit = new Circuit{ 1, 0, "LED"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::LED;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::LED;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.1f;
 	circuit->color[1] = 0.1f;
 	circuit->color[2] = 0.1f;
 }
 LED::~LED()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void LED::Update()
@@ -99,15 +102,15 @@ void LED::Update()
 ButtonPress::ButtonPress()
 {
 	circuit = new Circuit{ 0, 1, "ButtonPress"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::ButtonPress;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::ButtonPress;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.5f;
 	circuit->color[1] = 0.0f;
 	circuit->color[2] = 0.0f;
 }
 ButtonPress::~ButtonPress()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void ButtonPress::Update()
@@ -133,15 +136,15 @@ void ButtonPress::Update()
 ButtonHold::ButtonHold()
 {
 	circuit = new Circuit{ 0, 1, "ButtonHold"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::ButtonHold;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::ButtonHold;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.5f;
 	circuit->color[1] = 0.0f;
 	circuit->color[2] = 0.5f;
 }
 ButtonHold::~ButtonHold()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void ButtonHold::Update()
@@ -166,8 +169,8 @@ void ButtonHold::Update()
 ConstantTrue::ConstantTrue()
 {
 	circuit = new Circuit{ 0, 1, "ConstantTrue"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::ConstantTrue;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::ConstantTrue;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 1.0f;
 	circuit->color[1] = 1.0f;
 	circuit->color[2] = 1.0f;
@@ -175,7 +178,7 @@ ConstantTrue::ConstantTrue()
 }
 ConstantTrue::~ConstantTrue()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void ConstantTrue::Update()
@@ -185,8 +188,8 @@ void ConstantTrue::Update()
 ConstantFalse::ConstantFalse()
 {
 	circuit = new Circuit{ 0, 1, "ConstantFalse"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::ConstantFalse;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::ConstantFalse;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.2f;
 	circuit->color[1] = 0.2f;
 	circuit->color[2] = 0.2f;
@@ -194,7 +197,7 @@ ConstantFalse::ConstantFalse()
 }
 ConstantFalse::~ConstantFalse()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void ConstantFalse::Update()
@@ -204,15 +207,22 @@ void ConstantFalse::Update()
 InputNode::InputNode()
 {
 	circuit = new Circuit{ 0, 1, "InputNode" };
-	CircuitManager::circuits[circuit].type = DefinedCircuit::InputNode;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::InputNode;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.5f;
 	circuit->color[1] = 0.0f;
 	circuit->color[2] = 0.0f;
+	CircuitManager::managers[Settings::currentMapID]->inputs.push_back(this);
 }
 InputNode::~InputNode()
 {
-	CircuitManager::circuits.erase(circuit);
+	for(int i = 0; i < CircuitManager::managers[Settings::currentMapID]->inputs.size(); i++)
+		if (CircuitManager::managers[Settings::currentMapID]->inputs[i] == this)
+		{
+			CircuitManager::managers[Settings::currentMapID]->inputs.erase(CircuitManager::managers[Settings::currentMapID]->inputs.begin() + i);
+			break;
+		}
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void InputNode::Update()
@@ -222,15 +232,22 @@ void InputNode::Update()
 OutputNode::OutputNode()
 {
 	circuit = new Circuit{ 1, 0, "OutputNode" };
-	CircuitManager::circuits[circuit].type = DefinedCircuit::OutputNode;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::OutputNode;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.0f;
 	circuit->color[1] = 0.5f;
 	circuit->color[2] = 0.0f;
+	CircuitManager::managers[Settings::currentMapID]->outputs.push_back(this);
 }
 OutputNode::~OutputNode()
 {
-	CircuitManager::circuits.erase(circuit);
+	for (int i = 0; i < CircuitManager::managers[Settings::currentMapID]->outputs.size(); i++)
+		if (CircuitManager::managers[Settings::currentMapID]->outputs[i] == this)
+		{
+			CircuitManager::managers[Settings::currentMapID]->outputs.erase(CircuitManager::managers[Settings::currentMapID]->outputs.begin() + i);
+			break;
+		}
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void OutputNode::Update()
@@ -240,15 +257,15 @@ void OutputNode::Update()
 Clock60Hz::Clock60Hz()
 {
 	circuit = new Circuit{ 0, 1, "Clock60Hz"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::Clock60Hz;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::Clock60Hz;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 1.0f;
 	circuit->color[1] = 1.0f;
 	circuit->color[2] = 0.0f;
 }
 Clock60Hz::~Clock60Hz()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void Clock60Hz::Update()
@@ -264,15 +281,15 @@ void Clock60Hz::Update()
 Clock30Hz::Clock30Hz()
 {
 	circuit = new Circuit{ 0, 1, "Clock30Hz"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::Clock30Hz;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::Clock30Hz;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.5f;
 	circuit->color[1] = 0.5f;
 	circuit->color[2] = 0.0f;
 }
 Clock30Hz::~Clock30Hz()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void Clock30Hz::Update()
@@ -288,15 +305,15 @@ void Clock30Hz::Update()
 Clock15Hz::Clock15Hz()
 {
 	circuit = new Circuit{ 0, 1, "Clock15Hz"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::Clock15Hz;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::Clock15Hz;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.25f;
 	circuit->color[1] = 0.25f;
 	circuit->color[2] = 0.0f;
 }
 Clock15Hz::~Clock15Hz()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void Clock15Hz::Update()
@@ -312,15 +329,15 @@ void Clock15Hz::Update()
 AND::AND()
 {
 	circuit = new Circuit{ 2, 1, "AND"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::AND;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::AND;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.2f;
 	circuit->color[1] = 0.2f;
 	circuit->color[2] = 0.5f;
 }
 AND::~AND()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void AND::Update()
@@ -336,15 +353,15 @@ void AND::Update()
 NAND::NAND()
 {
 	circuit = new Circuit{ 2, 1 , "NAND"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::NAND;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::NAND;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.2f;
 	circuit->color[1] = 0.2f;
 	circuit->color[2] = 0.5f;
 }
 NAND::~NAND()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void NAND::Update()
@@ -360,15 +377,15 @@ void NAND::Update()
 OR::OR()
 {
 	circuit = new Circuit{ 2, 1, "OR"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::OR;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::OR;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.8f;
 	circuit->color[1] = 0.0f;
 	circuit->color[2] = 0.8f;
 }
 OR::~OR()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void OR::Update()
@@ -385,15 +402,15 @@ void OR::Update()
 NOR::NOR()
 {
 	circuit = new Circuit{ 2, 1, "NOR"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::NOR;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::NOR;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.8f;
 	circuit->color[1] = 0.0f;
 	circuit->color[2] = 0.8f;
 }
 NOR::~NOR()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void NOR::Update()
@@ -410,15 +427,15 @@ void NOR::Update()
 XOR::XOR()
 {
 	circuit = new Circuit{ 2, 1, "XOR"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::XOR;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::XOR;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.8f;
 	circuit->color[1] = 0.0f;
 	circuit->color[2] = 0.8f;
 }
 XOR::~XOR()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void XOR::Update()
@@ -435,15 +452,15 @@ void XOR::Update()
 XNOR::XNOR()
 {
 	circuit = new Circuit{ 2, 1, "XNOR"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::XNOR;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::XNOR;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.8f;
 	circuit->color[1] = 0.0f;
 	circuit->color[2] = 0.8f;
 }
 XNOR::~XNOR()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void XNOR::Update()
@@ -460,15 +477,15 @@ void XNOR::Update()
 NOT::NOT()
 {
 	circuit = new Circuit{ 1, 1, "NOT"};
-	CircuitManager::circuits[circuit].type = DefinedCircuit::NOT;
-	CircuitManager::circuits[circuit].pointer = this;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::NOT;
+	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.0f;
 	circuit->color[1] = 0.8f;
 	circuit->color[2] = 0.8f;
 }
 NOT::~NOT()
 {
-	CircuitManager::circuits.erase(circuit);
+	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void NOT::Update()
@@ -479,9 +496,11 @@ void NOT::Update()
 
 CUSTOM::CUSTOM()
 {
+	internalMapID = (new CircuitManager)->mapID;
 	circuit = new Circuit{ 0, 0, "CUSTOM" };
-	CircuitManager::circuits[circuit].type = DefinedCircuit::CUSTOM;
-	CircuitManager::circuits[circuit].pointer = this;
+	mapID = Settings::currentMapID;
+	CircuitManager::managers[mapID]->circuits[circuit].type = DefinedCircuit::CUSTOM;
+	CircuitManager::managers[mapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.1f;
 	circuit->color[1] = 1.0f;
 	circuit->color[2] = 0.1f;
@@ -490,13 +509,55 @@ CUSTOM::CUSTOM()
 }
 CUSTOM::~CUSTOM()
 {
-	CircuitManager::circuits.erase(circuit);
+	delete CircuitManager::managers[internalMapID];
+	CircuitManager::managers[mapID]->circuits.erase(circuit);
 	delete circuit;
 }
 void CUSTOM::Update()
 {
+	WireManager::Update();
+	UpdateIO();
+	// update circuits
+	CircuitManager::managers[internalMapID]->Update();
+	// update wires
+	WireManager::Update();
+	UpdateIO();
 }
-void CUSTOM::EditMode()
+void CUSTOM::UpdateIO()
 {
+	if (CircuitManager::managers[internalMapID]->inputs.size() != circuit->input.size())
+	{
+		circuit->input.resize(CircuitManager::managers[internalMapID]->inputs.size());
+		for (int i = 0; i < circuit->input.size(); i++)
+		{
+			circuit->input[i].type = 0;
+		}
+	}
+	if (CircuitManager::managers[internalMapID]->outputs.size() != circuit->output.size())
+	{
+		circuit->output.resize(CircuitManager::managers[internalMapID]->outputs.size());
+		for (int i = 0; i < circuit->output.size(); i++)
+		{
+			circuit->output[i].type = 1;
+		}
+	}
+	int spacing = 25;
+	circuit->height = std::max(circuit->input.size(), circuit->output.size()) * spacing;
+	for (int i = 0; i < circuit->input.size(); i++)
+	{
+		CircuitManager::managers[internalMapID]->inputs[i]->circuit->output[0].value = circuit->input[i].value;
+	}
+	for (int i = 0; i < circuit->output.size(); i++)
+	{
+		circuit->output[i].value = CircuitManager::managers[internalMapID]->outputs[i]->circuit->input[0].value;
+	}
+}
+void CUSTOM::EnterEditMode()
+{
+	Settings::currentMapID = internalMapID;
 
+}
+void CUSTOM::ExitEditMode()
+{
+	Settings::currentMapID = mapID;
 }
