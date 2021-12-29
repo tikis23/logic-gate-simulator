@@ -1,2 +1,1 @@
-# logic-gate-simulator
-Logic Gate Simulation
+# Logic Gate Simulator
