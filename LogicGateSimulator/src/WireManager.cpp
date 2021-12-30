@@ -3,6 +3,14 @@
 #include "WindowManager.h"
 #include "CoordinateSystem.h"
 
+WireManager::WireManager()
+{
+}
+
+WireManager::~WireManager()
+{
+}
+
 void WireManager::Update()
 {
 	if (eraseIndex >= 0)
@@ -78,8 +86,3 @@ void WireManager::DrawNewLine()
 		glEnd();
 	}
 }
-
-int WireManager::eraseIndex = -1;
-std::vector<Wire> WireManager::wires;
-Circuit::IO* WireManager::first;
-Circuit::IO* WireManager::second;

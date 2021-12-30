@@ -20,10 +20,14 @@ Circuit::Circuit(int inputs, int outputs, std::string name)
 	for (int i = 0; i < input.size(); i++)
 	{
 		input[i].type = 0;
+		input[i].fromCircuit = this;
+		input[i].index = i;
 	}
 	for (int i = 0; i < output.size(); i++)
 	{
 		output[i].type = 1;
+		output[i].fromCircuit = this;
+		output[i].index = i;
 	}
 }
 
@@ -107,21 +111,23 @@ void Circuit::RenderIO()
 	glPointSize(15);
 	glBegin(GL_POINTS);
 	glColor3f(0.8, 0.8, 0.8);
+	int spacing = height / (input.size() + 1);
 	for (int i = 0; i < input.size(); i++)
 	{
 		if(&input[i] == hoveredIO)
 			glColor3f(1, 1, 1);
 		input[i].posX = posX;
-		input[i].posY = posY + height / (i + 1) - 12;
+		input[i].posY = posY + spacing * (i + 1);
 		glVertex2f(CoordinateSystem::ScreenNormalizeX(CoordinateSystem::WorldToScreenX(input[i].posX)), CoordinateSystem::ScreenNormalizeY(CoordinateSystem::WorldToScreenY(input[i].posY)));
 		glColor3f(0.8, 0.8, 0.8);
 	}
+	spacing = height / (output.size() + 1);
 	for (int i = 0; i < output.size(); i++)
 	{
 		if (&output[i] == hoveredIO)
 			glColor3f(1, 1, 1);
 		output[i].posX = posX + width;
-		output[i].posY = posY + height / (i + 1) - 12;
+		output[i].posY = posY + spacing * (i + 1);
 		glVertex2f(CoordinateSystem::ScreenNormalizeX(CoordinateSystem::WorldToScreenX(output[i].posX)), CoordinateSystem::ScreenNormalizeY(CoordinateSystem::WorldToScreenY(output[i].posY)));
 		glColor3f(0.8, 0.8, 0.8);
 	}

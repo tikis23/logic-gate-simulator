@@ -1,6 +1,7 @@
 #include "CircuitManager.h"
 CircuitManager::CircuitManager()
 {
+	wireManager = new WireManager;
 	mapID = 0;
 	for (auto it = managers.cbegin(), end = managers.cend(); it != end && mapID == it->first; ++it, ++mapID)
 	{
@@ -10,6 +11,7 @@ CircuitManager::CircuitManager()
 
 CircuitManager::~CircuitManager()
 {
+	delete wireManager;
 	Exit();
 	managers.erase(mapID);
 }
@@ -188,8 +190,8 @@ void CircuitManager::Update()
 
 void CircuitManager::Exit()
 {
-	for (auto& it : circuits)
-		delete it.first;
+	//for (auto& it : circuits)
+	//	delete it.first;
 }
 
 std::unordered_map<int, CircuitManager*> CircuitManager::managers;

@@ -14,9 +14,9 @@ void Renderer::Render()
 		circ.first->RenderIO();
 		circ.first->RenderFont();
 	}
-	for (int i = 0; i < WireManager::wires.size(); i++)
+	for (int i = 0; i < CircuitManager::managers[Settings::currentMapID]->wireManager->wires.size(); i++)
 	{
-		WireManager::wires[i].Render();
+		CircuitManager::managers[Settings::currentMapID]->wireManager->wires[i].Render();
 	}
-	WireManager::DrawNewLine();
+	CircuitManager::managers[Settings::currentMapID]->wireManager->DrawNewLine();
 }

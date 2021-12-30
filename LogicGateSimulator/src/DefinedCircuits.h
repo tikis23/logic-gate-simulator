@@ -34,6 +34,7 @@ namespace DefinedCircuit
 }
 
 void CreateDefinedCircuit(int type);
+Circuit* DuplicateDefinedCircuit(int type, void* ptr);
 
 class LED
 {
@@ -41,6 +42,7 @@ public:
 	LED();
 	~LED();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -50,6 +52,7 @@ public:
 	ButtonPress();
 	~ButtonPress();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -59,6 +62,7 @@ public:
 	ButtonHold();
 	~ButtonHold();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -68,6 +72,7 @@ public:
 	ConstantTrue();
 	~ConstantTrue();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -77,6 +82,7 @@ public:
 	ConstantFalse();
 	~ConstantFalse();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -86,6 +92,7 @@ public:
 	InputNode();
 	~InputNode();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -95,6 +102,7 @@ public:
 	OutputNode();
 	~OutputNode();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -104,6 +112,7 @@ public:
 	Clock60Hz();
 	~Clock60Hz();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 private:
 	int counter = 0;
@@ -115,6 +124,7 @@ public:
 	Clock30Hz();
 	~Clock30Hz();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 private:
 	int counter = 0;
@@ -126,6 +136,7 @@ public:
 	Clock15Hz();
 	~Clock15Hz();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 private:
 	int counter = 0;
@@ -137,6 +148,7 @@ public:
 	AND();
 	~AND();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -146,6 +158,7 @@ public:
 	NAND();
 	~NAND();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -155,6 +168,7 @@ public:
 	OR();
 	~OR();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -164,6 +178,7 @@ public:
 	NOR();
 	~NOR();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -173,6 +188,7 @@ public:
 	XOR();
 	~XOR();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -182,6 +198,7 @@ public:
 	XNOR();
 	~XNOR();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -191,6 +208,7 @@ public:
 	NOT();
 	~NOT();
 	void Update();
+	Circuit* Duplicate();
 	Circuit* circuit;
 };
 
@@ -203,6 +221,7 @@ public:
 	void UpdateIO();
 	void EnterEditMode();
 	void ExitEditMode();
+	Circuit* Duplicate();
 	Circuit* circuit;
 	int internalMapID;
 	int mapID;

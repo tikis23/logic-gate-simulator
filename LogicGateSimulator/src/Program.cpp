@@ -84,7 +84,7 @@ void Program::logicLoop()
 		// update circuits
 		CircuitManager::managers[Settings::currentMapID]->Update();
 		// update wires
-		WireManager::Update();
+		CircuitManager::managers[Settings::currentMapID]->wireManager->Update();
 
 		std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - timerStart);
 		if(diff < std::chrono::milliseconds(10))
@@ -106,8 +106,26 @@ void Program::renderLoop()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// input
-		WireManager::ConnectNewLine();
-
+		CircuitManager::managers[Settings::currentMapID]->wireManager->ConnectNewLine();
+		if (Input::GetMouseButton(WindowManager::GetWindow("main")->GetHandle(), Input::Mouse::LEFT, Input::Action::PRESS))
+		{
+			for (auto& it : CircuitManager::managers[Settings::currentMapID]->circuits)
+			{
+				if (Circuit::hovered == it.first && it.second.type == DefinedCircuit::ButtonPress)
+				{
+					if (it.first->output[0].value == false)
+					{
+						it.first->output[0].value = true;
+						it.first->color[0] = 1.0f;
+					}
+					else
+					{
+						it.first->output[0].value = false;
+						it.first->color[0] = 0.5f;
+					}
+				}
+			}
+		}
 
 		// menus
 		if (!ImGuiManager::Update())
@@ -124,7 +142,7 @@ void Program::renderLoop()
 		FontRenderer::RenderFont();
 		ImGuiManager::Render();
 		// swap buffers and poll input
-		WindowManager::GetWindow("main")->Update();
+		WindowManager::GetWindow("main")->Update();		
 		Input::Poll();
 		glfwPollEvents();
 	}

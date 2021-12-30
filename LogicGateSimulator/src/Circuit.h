@@ -18,6 +18,8 @@ public:
 		bool value = false;
 		bool type;
 		int posX, posY;
+		Circuit* fromCircuit;
+		int index;
 	};
 	std::vector<IO> input;
 	std::vector<IO> output;

@@ -6,7 +6,6 @@
 #include "imgui/imgui_stdlib.h"
 
 #include "WindowManager.h"
-#include "DefinedCircuits.h"
 #include "Input.h"
 #include "Settings.h"
 
@@ -99,7 +98,7 @@ bool ImGuiManager::Update()
 	}
 
 
-	if (Circuit::hovered != nullptr && Input::GetMouseButton(WindowManager::GetWindow("main")->GetHandle(), Input::Mouse::RIGHT, Input::Action::PRESS))
+	if (Input::GetMouseButton(WindowManager::GetWindow("main")->GetHandle(), Input::Mouse::RIGHT, Input::Action::PRESS))
 	{
 		deletableCircuit = Circuit::hovered;
 		ImGui::OpenPopup("Popup");
@@ -107,10 +106,34 @@ bool ImGuiManager::Update()
 
 	if (ImGui::BeginPopup("Popup"))
 	{
-		if(ImGui::Button("Delete"))
+		if(deletableCircuit != nullptr && ImGui::Button("Delete"))
 		{
 			CircuitManager::managers[Settings::currentMapID]->RemoveCircuit(deletableCircuit);
 			deletableCircuit = nullptr;
+			ImGui::CloseCurrentPopup();
+		}
+		if (deletableCircuit != nullptr && ImGui::Button("Duplicate"))
+		{
+			DuplicateDefinedCircuit(CircuitManager::managers[Settings::currentMapID]->circuits[deletableCircuit].type, CircuitManager::managers[Settings::currentMapID]->circuits[deletableCircuit].pointer);
+			deletableCircuit = nullptr;
+			ImGui::CloseCurrentPopup();
+		}
+		if (ImGui::Button("Enter Edit Mode"))
+		{
+			if (deletableCircuit != nullptr && CircuitManager::managers[Settings::currentMapID]->circuits[deletableCircuit].type == DefinedCircuit::CUSTOM)
+			{
+				editingCircuit = (CUSTOM*)CircuitManager::managers[Settings::currentMapID]->circuits[deletableCircuit].pointer;
+				editingCircuit->EnterEditMode();
+			}
+			ImGui::CloseCurrentPopup();
+		}
+		if (ImGui::Button("Exit Edit Mode"))
+		{
+			if (editingCircuit != nullptr)
+			{
+				editingCircuit->ExitEditMode();
+				editingCircuit = nullptr;
+			}
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndPopup();
@@ -125,3 +148,4 @@ void ImGuiManager::Render()
 }
 
 Circuit* ImGuiManager::deletableCircuit = nullptr;
+CUSTOM* ImGuiManager::editingCircuit = nullptr;

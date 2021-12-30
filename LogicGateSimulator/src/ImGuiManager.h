@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CircuitManager.h"
+#include "DefinedCircuits.h"
 class ImGuiManager
 {
 public:
@@ -12,4 +13,5 @@ public:
 private:
 	ImGuiManager();
 	static Circuit* deletableCircuit;
+	static CUSTOM* editingCircuit;
 };

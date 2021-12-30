@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include "Circuit.h"
 #include "DefinedCircuits.h"
+#include "WireManager.h"
+
 class CircuitManager
 {
 public:
@@ -24,4 +26,5 @@ public:
 	std::vector<InputNode*> inputs;
 	std::vector<OutputNode*> outputs;
 	static std::unordered_map<int, CircuitManager*> managers;
+	WireManager* wireManager;
 };

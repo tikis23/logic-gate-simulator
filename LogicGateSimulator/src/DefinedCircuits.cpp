@@ -76,6 +76,76 @@ void CreateDefinedCircuit(int type)
 	}
 }
 
+Circuit* DuplicateDefinedCircuit(int type, void* ptr)
+{
+	switch (type)
+	{
+	default:
+		break;
+		// custom
+	case DefinedCircuit::CUSTOM:
+		return ((CUSTOM*)ptr)->Duplicate();
+		break;
+
+		// gates
+	case DefinedCircuit::AND:
+		return ((AND*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::NAND:
+		return ((NAND*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::OR:
+		return ((OR*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::NOR:
+		return ((NOR*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::XOR:
+		return ((XOR*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::XNOR:
+		return ((XNOR*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::NOT:
+		return ((NOT*)ptr)->Duplicate();
+		break;
+
+		// clocks
+	case DefinedCircuit::Clock60Hz:
+		return ((Clock60Hz*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::Clock30Hz:
+		return ((Clock30Hz*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::Clock15Hz:
+		return ((Clock15Hz*)ptr)->Duplicate();
+		break;
+
+		// misc
+	case DefinedCircuit::LED:
+		return ((LED*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::ButtonPress:
+		return ((ButtonPress*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::ButtonHold:
+		return ((ButtonHold*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::ConstantTrue:
+		return ((ConstantTrue*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::ConstantFalse:
+		return ((ConstantFalse*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::InputNode:
+		return ((InputNode*)ptr)->Duplicate();
+		break;
+	case DefinedCircuit::OutputNode:
+		return ((OutputNode*)ptr)->Duplicate();
+		break;
+	}
+}
+
 LED::LED()
 {
 	circuit = new Circuit{ 1, 0, "LED"};
@@ -98,6 +168,12 @@ void LED::Update()
 		circuit->color[0] = 0.0f;
 	circuit->input[0].value = false;
 }
+Circuit* LED::Duplicate()
+{
+	LED* temp = new LED;
+	*temp->circuit = *circuit;
+	return temp->circuit;
+}
 
 ButtonPress::ButtonPress()
 {
@@ -115,22 +191,12 @@ ButtonPress::~ButtonPress()
 }
 void ButtonPress::Update()
 {
-	if (Circuit::hovered == circuit)
-	{
-		if (Input::GetMouseButton(WindowManager::GetWindow("main")->GetHandle(), Input::Mouse::LEFT, Input::Action::PRESS))
-		{
-			if (circuit->output[0].value == false)
-			{
-				circuit->output[0].value = true;
-				circuit->color[0] = 1.0f;
-			}
-			else
-			{
-				circuit->output[0].value = false;
-				circuit->color[0] = 0.5f;
-			}
-		}
-	}
+}
+Circuit* ButtonPress::Duplicate()
+{
+	ButtonPress* temp = new ButtonPress;
+	*temp->circuit = *circuit;
+	return temp->circuit;
 }
 
 ButtonHold::ButtonHold()
@@ -165,6 +231,12 @@ void ButtonHold::Update()
 		circuit->color[2] = 0.5f;
 	}
 }
+Circuit* ButtonHold::Duplicate()
+{
+	ButtonHold* temp = new ButtonHold;
+	*temp->circuit = *circuit;
+	return temp->circuit;
+}
 
 ConstantTrue::ConstantTrue()
 {
@@ -183,6 +255,12 @@ ConstantTrue::~ConstantTrue()
 }
 void ConstantTrue::Update()
 {
+}
+Circuit* ConstantTrue::Duplicate()
+{
+	ConstantTrue* temp = new ConstantTrue;
+	*temp->circuit = *circuit;
+	return temp->circuit;
 }
 
 ConstantFalse::ConstantFalse()
@@ -203,16 +281,23 @@ ConstantFalse::~ConstantFalse()
 void ConstantFalse::Update()
 {
 }
+Circuit* ConstantFalse::Duplicate()
+{
+	ConstantFalse* temp = new ConstantFalse;
+	*temp->circuit = *circuit;
+	return temp->circuit;
+}
 
 InputNode::InputNode()
 {
-	circuit = new Circuit{ 0, 1, "InputNode" };
+	circuit = new Circuit{ 0, 1, "Input" };
 	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::InputNode;
 	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.5f;
 	circuit->color[1] = 0.0f;
 	circuit->color[2] = 0.0f;
 	CircuitManager::managers[Settings::currentMapID]->inputs.push_back(this);
+	circuit->name += " " + std::to_string(CircuitManager::managers[Settings::currentMapID]->inputs.size() - 1);
 }
 InputNode::~InputNode()
 {
@@ -223,21 +308,30 @@ InputNode::~InputNode()
 			break;
 		}
 	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
+	for (int i = 0; i < CircuitManager::managers[Settings::currentMapID]->inputs.size(); i++)
+		CircuitManager::managers[Settings::currentMapID]->inputs[i]->circuit->name = "Input " + std::to_string(i);
 	delete circuit;
 }
 void InputNode::Update()
 {
 }
+Circuit* InputNode::Duplicate()
+{
+	InputNode* temp = new InputNode;
+	*temp->circuit = *circuit;
+	return temp->circuit;
+}
 
 OutputNode::OutputNode()
 {
-	circuit = new Circuit{ 1, 0, "OutputNode" };
+	circuit = new Circuit{ 1, 0, "Output" };
 	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].type = DefinedCircuit::OutputNode;
 	CircuitManager::managers[Settings::currentMapID]->circuits[circuit].pointer = this;
 	circuit->color[0] = 0.0f;
 	circuit->color[1] = 0.5f;
 	circuit->color[2] = 0.0f;
 	CircuitManager::managers[Settings::currentMapID]->outputs.push_back(this);
+	circuit->name += " " + std::to_string(CircuitManager::managers[Settings::currentMapID]->outputs.size() - 1);
 }
 OutputNode::~OutputNode()
 {
@@ -248,10 +342,18 @@ OutputNode::~OutputNode()
 			break;
 		}
 	CircuitManager::managers[Settings::currentMapID]->circuits.erase(circuit);
+	for (int i = 0; i < CircuitManager::managers[Settings::currentMapID]->outputs.size(); i++)
+		CircuitManager::managers[Settings::currentMapID]->outputs[i]->circuit->name = "Output " + std::to_string(i);
 	delete circuit;
 }
 void OutputNode::Update()
 {
+}
+Circuit* OutputNode::Duplicate()
+{
+	OutputNode* temp = new OutputNode;
+	*temp->circuit = *circuit;
+	return temp->circuit;
 }
 
 Clock60Hz::Clock60Hz()
@@ -277,6 +379,12 @@ void Clock60Hz::Update()
 	}
 	counter++;
 }
+Circuit* Clock60Hz::Duplicate()
+{
+	Clock60Hz* temp = new Clock60Hz;
+	*temp->circuit = *circuit;
+	return temp->circuit;
+}
 
 Clock30Hz::Clock30Hz()
 {
@@ -300,6 +408,12 @@ void Clock30Hz::Update()
 		counter = 0;
 	}
 	counter++;
+}
+Circuit* Clock30Hz::Duplicate()
+{
+	Clock30Hz* temp = new Clock30Hz;
+	*temp->circuit = *circuit;
+	return temp->circuit;
 }
 
 Clock15Hz::Clock15Hz()
@@ -325,6 +439,12 @@ void Clock15Hz::Update()
 	}
 	counter++;
 }
+Circuit* Clock15Hz::Duplicate()
+{
+	Clock15Hz* temp = new Clock15Hz;
+	*temp->circuit = *circuit;
+	return temp->circuit;
+}
 
 AND::AND()
 {
@@ -349,6 +469,12 @@ void AND::Update()
 	circuit->input[0].value = false;
 	circuit->input[1].value = false;
 }
+Circuit* AND::Duplicate()
+{
+	AND* temp = new AND;
+	*temp->circuit = *circuit;
+	return temp->circuit;
+}
 
 NAND::NAND()
 {
@@ -372,6 +498,12 @@ void NAND::Update()
 		circuit->output[0].value = false;
 	circuit->input[0].value = false;
 	circuit->input[1].value = false;
+}
+Circuit* NAND::Duplicate()
+{
+	NAND* temp = new NAND;
+	*temp->circuit = *circuit;
+	return temp->circuit;
 }
 
 OR::OR()
@@ -398,6 +530,12 @@ void OR::Update()
 	circuit->input[0].value = false;
 	circuit->input[1].value = false;
 }
+Circuit* OR::Duplicate()
+{
+	OR* temp = new OR;
+	*temp->circuit = *circuit;
+	return temp->circuit;
+}
 
 NOR::NOR()
 {
@@ -422,6 +560,12 @@ void NOR::Update()
 
 	circuit->input[0].value = false;
 	circuit->input[1].value = false;
+}
+Circuit* NOR::Duplicate()
+{
+	NOR* temp = new NOR;
+	*temp->circuit = *circuit;
+	return temp->circuit;
 }
 
 XOR::XOR()
@@ -448,6 +592,12 @@ void XOR::Update()
 	circuit->input[0].value = false;
 	circuit->input[1].value = false;
 }
+Circuit* XOR::Duplicate()
+{
+	XOR* temp = new XOR;
+	*temp->circuit = *circuit;
+	return temp->circuit;
+}
 
 XNOR::XNOR()
 {
@@ -473,6 +623,12 @@ void XNOR::Update()
 	circuit->input[0].value = false;
 	circuit->input[1].value = false;
 }
+Circuit* XNOR::Duplicate()
+{
+	XNOR* temp = new XNOR;
+	*temp->circuit = *circuit;
+	return temp->circuit;
+}
 
 NOT::NOT()
 {
@@ -492,6 +648,12 @@ void NOT::Update()
 {
 	circuit->output[0].value = !circuit->input[0].value;
 	circuit->input[0].value = false;
+}
+Circuit* NOT::Duplicate()
+{
+	NOT* temp = new NOT;
+	*temp->circuit = *circuit;
+	return temp->circuit;
 }
 
 CUSTOM::CUSTOM()
@@ -515,13 +677,24 @@ CUSTOM::~CUSTOM()
 }
 void CUSTOM::Update()
 {
-	WireManager::Update();
 	UpdateIO();
+	for (int i = 0; i < circuit->output.size(); i++)
+		CircuitManager::managers[internalMapID]->outputs[i]->circuit->input[0].value = false;
+	for (int i = 0; i < circuit->input.size(); i++)
+		CircuitManager::managers[internalMapID]->inputs[i]->circuit->output[0].value = circuit->input[i].value;
+
+
+	CircuitManager::managers[internalMapID]->wireManager->Update();
 	// update circuits
 	CircuitManager::managers[internalMapID]->Update();
 	// update wires
-	WireManager::Update();
-	UpdateIO();
+	CircuitManager::managers[internalMapID]->wireManager->Update();
+
+
+	for (int i = 0; i < circuit->output.size(); i++)
+		circuit->output[i].value = CircuitManager::managers[internalMapID]->outputs[i]->circuit->input[0].value;
+	for (int i = 0; i < circuit->input.size(); i++)
+		circuit->input[i].value = false;
 }
 void CUSTOM::UpdateIO()
 {
@@ -531,7 +704,11 @@ void CUSTOM::UpdateIO()
 		for (int i = 0; i < circuit->input.size(); i++)
 		{
 			circuit->input[i].type = 0;
+			circuit->input[i].fromCircuit = circuit;
+			circuit->input[i].index = i;
 		}
+		int spacing = 25;
+		circuit->height = std::max(circuit->input.size(), circuit->output.size()) * spacing;
 	}
 	if (CircuitManager::managers[internalMapID]->outputs.size() != circuit->output.size())
 	{
@@ -539,18 +716,13 @@ void CUSTOM::UpdateIO()
 		for (int i = 0; i < circuit->output.size(); i++)
 		{
 			circuit->output[i].type = 1;
+			circuit->output[i].fromCircuit = circuit;
+			circuit->output[i].index = i;
 		}
+		int spacing = 25;
+		circuit->height = std::max(circuit->input.size(), circuit->output.size()) * spacing;
 	}
-	int spacing = 25;
-	circuit->height = std::max(circuit->input.size(), circuit->output.size()) * spacing;
-	for (int i = 0; i < circuit->input.size(); i++)
-	{
-		CircuitManager::managers[internalMapID]->inputs[i]->circuit->output[0].value = circuit->input[i].value;
-	}
-	for (int i = 0; i < circuit->output.size(); i++)
-	{
-		circuit->output[i].value = CircuitManager::managers[internalMapID]->outputs[i]->circuit->input[0].value;
-	}
+
 }
 void CUSTOM::EnterEditMode()
 {
@@ -560,4 +732,36 @@ void CUSTOM::EnterEditMode()
 void CUSTOM::ExitEditMode()
 {
 	Settings::currentMapID = mapID;
+}
+Circuit* CUSTOM::Duplicate()
+{
+	CUSTOM* temp = new CUSTOM;
+	*temp->circuit = *circuit;
+
+	// copy map
+	int tempID = Settings::currentMapID;
+	Settings::currentMapID = temp->internalMapID;
+	CircuitManager* copyTo = CircuitManager::managers[temp->internalMapID];
+	CircuitManager* copyFrom = CircuitManager::managers[internalMapID];
+
+	// copy circuits
+	std::unordered_map<Circuit*, Circuit*> wiringMap;
+	for (auto& it : copyFrom->circuits)
+		wiringMap[it.first] = DuplicateDefinedCircuit(it.second.type, it.second.pointer);
+	temp->UpdateIO();
+	
+	// copy wires
+	for (auto& it : copyFrom->wireManager->wires)
+	{
+		Circuit* wireFrom = wiringMap[it.input->fromCircuit];
+		Circuit* wireTo = wiringMap[it.output->fromCircuit];
+		copyTo->wireManager->wires.push_back(Wire{ &wireFrom->output[it.input->index], &wireTo->input[it.output->index] });
+		copyTo->wireManager->wires.back().input->fromCircuit = wireFrom;
+		copyTo->wireManager->wires.back().input->index = it.input->index;
+		copyTo->wireManager->wires.back().output->fromCircuit = wireTo;
+		copyTo->wireManager->wires.back().output->index = it.output->index;
+	}
+	// exit
+	Settings::currentMapID = tempID;
+	return temp->circuit;
 }

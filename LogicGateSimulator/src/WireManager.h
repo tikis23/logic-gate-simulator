@@ -5,13 +5,14 @@
 class WireManager
 {
 public:
-	static void Update();
-	static void ConnectNewLine();
-	static void DrawNewLine();
-	static std::vector<Wire> wires;
-	static int eraseIndex;
-private:
 	WireManager();
-	static Circuit::IO* first;
-	static Circuit::IO* second;
+	~WireManager();
+	void Update();
+	void ConnectNewLine();
+	void DrawNewLine();
+	std::vector<Wire> wires;
+	int eraseIndex = -1;
+private:
+	Circuit::IO* first;
+	Circuit::IO* second;
 };
